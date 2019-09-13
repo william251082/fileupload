@@ -3,10 +3,7 @@
 namespace App\Form;
 
 use App\Entity\Article;
-use App\Entity\User;
-use App\Repository\ArticleRepository;
 use App\Repository\UserRepository;
-use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\Extension\Core\Type\FileType;
@@ -16,6 +13,8 @@ use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\FormEvents;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
+use Symfony\Component\Validator\Constraints\Image;
+use Symfony\Component\Validator\Constraints\NotNull;
 
 class ArticleFormType extends AbstractType
 {
@@ -50,11 +49,27 @@ class ArticleFormType extends AbstractType
                     'Interstellar Space' => 'interstellar_space'
                 ],
                 'required' => false,
+            ]);
+
+        $imageConstraints = [
+            new Image([
+                'maxSize' => '5M'
             ])
+        ];
+
+        if (!$isEdit || !$article->getImageFilename()) {
+            $imageConstraints[] = new NotNull([
+                'message' => 'Please upload an image'
+            ]);
+        }
+
+        $builder
             -> add('imageFile', FileType::class, [
                 'mapped' => false,
-                'required' => false
-            ])
+                'required' => false,
+                'constraints' => $imageConstraints
+                ]
+            )
         ;
 
         if ($options['include_published_at']) {
