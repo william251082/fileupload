@@ -2,6 +2,8 @@
 .vscode
 .env
 
+/public/uploads
+
 /.env
 /.env.local
 /.env.local.php
