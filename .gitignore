@@ -3,6 +3,8 @@
 .env
 
 /public/uploads
+composer.lock
+symfony.lock
 
 /.env
 /.env.local
@@ -61,3 +63,6 @@
 
 # Embedded web-server pid file
 /.web-server-pid
+###> liip/imagine-bundle ###
+/public/media/cache/
+###< liip/imagine-bundle ###
