@@ -82,6 +82,22 @@ class ArticleReferenceAdminController extends BaseController
     }
 
     /**
+     * @Route("/admin/article/{id}/references", name="admin_article_list_references", methods={"GET"})
+     * @IsGranted("MANAGE", subject="article")
+     */
+    public function getArticleReferences(Article $article)
+    {
+        return $this->json(
+            $article->getArticleReferences(),
+            200,
+            [],
+            [
+                'groups' => ['main']
+            ]
+        );
+    }
+
+    /**
      * @Route("/admin/article/references/{id}/download", name="admin_article_download_reference", methods={"GET"})
      */
     public function downloadArticleReference(ArticleReference $reference, UploaderHelper $uploaderHelper)
