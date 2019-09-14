@@ -35,6 +35,7 @@ class ArticleReferenceAdminController extends BaseController
     {
         /** @var UploadedFile $uploadedFile */
         $uploadedFile = $request->files->get('reference');
+        dump($uploadedFile);
 
         // object that holds errors
         $violations = $validator->validate(
