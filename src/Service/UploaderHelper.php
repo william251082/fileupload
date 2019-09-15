@@ -25,21 +25,17 @@ class UploaderHelper
 
     private $publicAssetBaseUrl;
 
-    private $privateFilesystem;
-
     public function __construct(
-        FilesystemInterface $publicUploadFilesystem,
-        FilesystemInterface $privateUploadFilesystem,
+        FilesystemInterface $uploadFilesystem,
         RequestStackContext $requestStackContext,
         LoggerInterface $logger,
         string $uploadedAssetsBaseUrl
     )
     {
         $this->requestStackContext = $requestStackContext;
-        $this->filesystem = $publicUploadFilesystem;
+        $this->filesystem = $uploadFilesystem;
         $this->logger = $logger;
         $this->publicAssetBaseUrl = $uploadedAssetsBaseUrl;
-        $this->privateFilesystem = $privateUploadFilesystem;
     }
 
     public function uploadArticleImage(File $file, ?string $existingFilename): string
@@ -82,11 +78,9 @@ class UploaderHelper
             ->getBasePath().$this->publicAssetBaseUrl.'/'.$path;
     }
 
-    public function readStream(string $path, bool $isPublic)
+    public function readStream(string $path)
     {
-        $filesystem = $isPublic ? $this->filesystem : $this->privateFilesystem;
-
-        $resource = $filesystem->readStream($path);
+        $resource = $this->filesystem->readStream($path);
 
         if ($resource === false) {
             throw new \Exception(sprintf('Error opening stream for "%s"', $path));
@@ -95,11 +89,9 @@ class UploaderHelper
         return $resource;
     }
 
-    public function deleteFile(string $path, bool $isPublic)
+    public function deleteFile(string $path)
     {
-        $filesystem = $isPublic ? $this->filesystem : $this->privateFilesystem;
-
-        $result = $filesystem->delete($path);
+        $result = $this->filesystem->delete($path);
 
         if ($result === false) {
             throw new \Exception(sprintf('Error deleting "%s"', $path));
@@ -108,7 +100,7 @@ class UploaderHelper
         return $result;
     }
 
-    private function uploadFile(File $file, string $directory, bool $isPublic): string
+    private function uploadFile(File $file, string $directory): string
     {
         if ($file instanceof UploadedFile) {
             $originalFilename = $file->getClientOriginalName();
@@ -120,10 +112,8 @@ class UploaderHelper
             pathinfo($originalFilename, PATHINFO_FILENAME)
             ).'-'.uniqid().'.'.$file->guessExtension();
 
-        $filesystem = $isPublic ? $this->filesystem : $this->privateFilesystem;
-
         $stream = fopen($file->getPathname(), 'r');
-        $result = $filesystem->writeStream(
+        $result = $this->filesystem->writeStream(
             $directory.'/'.$newFilename,
             $stream
         );
