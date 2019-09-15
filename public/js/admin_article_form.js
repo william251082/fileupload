@@ -36,6 +36,7 @@ class ReferenceList
 {
     constructor($element) {
         this.$element = $element;
+
         this.sortable = Sortable.create(this.$element[0], {
             handle: '.drag-handle',
             animation: 150,
@@ -47,6 +48,7 @@ class ReferenceList
                 });
             }
         });
+
         this.references = [];
         this.render();
 

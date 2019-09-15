@@ -45,6 +45,11 @@ class ArticleReference
      */
     private $mimeType;
 
+    /**
+     * @ORM\Column(type="integer")
+     */
+    private $position = 0;
+
     public function __construct(Article $article)
     {
         $this->article = $article;
@@ -99,5 +104,17 @@ class ArticleReference
     public function getFilePath(): string
     {
         return UploaderHelper::ARTICLE_REFERENCE.'/'.$this->getFilename();
+    }
+
+    public function getPosition(): ?int
+    {
+        return $this->position;
+    }
+
+    public function setPosition(int $position): self
+    {
+        $this->position = $position;
+
+        return $this;
     }
 }
