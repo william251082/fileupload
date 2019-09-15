@@ -41,6 +41,7 @@ class ReferenceList
             handle: '.drag-handle',
             animation: 150,
             onEnd: () => {
+
                 $.ajax({
                     url: this.$element.data('url')+'/reorder',
                     method: 'POST',
