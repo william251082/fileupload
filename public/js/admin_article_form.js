@@ -53,7 +53,6 @@ class ReferenceList
         this.$element.on('click', '.js-reference-delete', (event) => {
             this.handleReferenceDelete(event);
         });
-
         this.$element.on('blur', '.js-edit-filename', (event) => {
             this.handleReferenceEditFilename(event);
         });
@@ -94,13 +93,14 @@ class ReferenceList
         const reference = this.references.find(reference => {
             return reference.id === id;
         });
+
         reference.originalFilename = $(event.currentTarget).val();
 
         $.ajax({
             url: '/admin/article/references/'+id,
             method: 'PUT',
             data: JSON.stringify(reference)
-        });
+        }); // handle 400s here using catch
     }
 
     render() {
@@ -108,6 +108,7 @@ class ReferenceList
             return `
 <li class="list-group-item d-flex justify-content-between align-items-center" data-id="${reference.id}">
     <span class="drag-handle fa fa-reorder"></span>
+    
     <input type="text" value="${reference.originalFilename}" class="form-control js-edit-filename" style="width: auto;">
 
     <span>

@@ -149,7 +149,8 @@ class ArticleReferenceAdminController extends BaseController
         UploaderHelper $uploaderHelper,
         EntityManagerInterface $manager,
         SerializerInterface $serializer,
-        Request $request
+        Request $request,
+        ValidatorInterface $validator
     )
     {
         $article = $reference->getArticle();
@@ -164,6 +165,12 @@ class ArticleReferenceAdminController extends BaseController
                 'groups' => ['input']
             ]
         );
+
+        $violations = $validator->validate($reference);
+
+        if ($violations->count() > 0) {
+            return $this->json($violations, 400);
+        }
 
         $manager->persist($reference);
         $manager->flush();
