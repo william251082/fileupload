@@ -11,6 +11,9 @@
     "league/flysystem": {
         "version": "1.0.55"
     },
+    "league/flysystem-aws-s3-v3": {
+        "version": "1.0.23"
+    },
     "liip/imagine-bundle": {
         "version": "1.8",
         "recipe": {
