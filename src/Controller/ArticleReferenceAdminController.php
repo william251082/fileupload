@@ -4,6 +4,7 @@
 namespace App\Controller;
 
 
+use App\Api\ArticleReferenceUploadApiModel;
 use App\Entity\Article;
 use App\Entity\ArticleReference;
 use App\Service\UploaderHelper;
@@ -25,18 +26,35 @@ class ArticleReferenceAdminController extends BaseController
 {
     /**
      * @Route("/admin/article/{id}/references", name="admin_article_add_reference", methods={"POST"})
-     * @IsGranted("MANAGE", subject="article")
      */
     public function uploadArticleReference(
         Article $article,
         Request $request,
         UploaderHelper $uploaderHelper,
         EntityManagerInterface $manager,
-        ValidatorInterface $validator
+        ValidatorInterface $validator,
+        SerializerInterface $serializer,
+        ArticleReferenceUploadApiModel $uploadApiModel
     )
     {
-        /** @var UploadedFile $uploadedFile */
-        $uploadedFile = $request->files->get('reference');
+        if ($request->headers->get('COntent-Type') === 'application/json') {
+            $uploadApiModel = $serializer->deserialize(
+                $request->getContent(),
+                ArticleReferenceUploadApiModel::class,
+                'json'
+            );
+
+            $violations = $validator->validate($uploadApiModel);
+
+            if ($violations->count() > 0) {
+                return $this->json($violations, 400);
+            }
+
+            dd($uploadApiModel);
+        } else {
+            /** @var UploadedFile $uploadedFile */
+            $uploadedFile = $request->files->get('reference');
+        }
 
         $violations = $validator->validate(
             $uploadedFile,
