@@ -15,6 +15,7 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\StreamedResponse;
 use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\Serializer\SerializerInterface;
 use Symfony\Component\Validator\Constraints\File;
 use Symfony\Component\Validator\Constraints\NotBlank;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
@@ -123,7 +124,7 @@ class ArticleReferenceAdminController extends BaseController
     }
 
     /**
-     * @Route("/admin/article/references/{id}", name="admin_article_delete_references", methods={"DELETE"})
+     * @Route("/admin/article/references/{id}", name="admin_article_delete_reference", methods={"DELETE"})
      */
     public function deleteArticleReference(
         ArticleReference $reference, UploaderHelper $uploaderHelper, EntityManagerInterface $manager
@@ -138,5 +139,44 @@ class ArticleReferenceAdminController extends BaseController
         $uploaderHelper->deleteFile($reference->getFilePath(), false);
 
         return new Response(null, 204);
+    }
+
+    /**
+     * @Route("/admin/article/references/{id}", name="admin_article_update_reference", methods={"PUT"})
+     */
+    public function updateArticleReference(
+        ArticleReference $reference,
+        UploaderHelper $uploaderHelper,
+        EntityManagerInterface $manager,
+        SerializerInterface $serializer,
+        Request $request
+    )
+    {
+        $article = $reference->getArticle();
+        $this->denyAccessUnlessGranted('MANAGE', $article);
+
+        $serializer->deserialize(
+            $request->getContent(),
+            ArticleReference::class,
+            'json',
+            [
+                'object_to_populate' => $reference,
+                'groups' => ['input']
+            ]
+        );
+
+        $manager->persist($reference);
+        $manager->flush();
+
+        $uploaderHelper->deleteFile($reference->getFilePath(), false);
+
+        return $this->json(
+            $reference,
+            201,
+            [],
+            [
+                'groups' => ['main']
+            ]
+        );
     }
 }
