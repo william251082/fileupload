@@ -74,6 +74,7 @@ class ReferenceList
     handleReferenceDelete(event) {
         const $li = $(event.currentTarget).closest('.list-group-item');
         const id = $li.data('id');
+
         $li.addClass('disabled');
 
         $.ajax({
